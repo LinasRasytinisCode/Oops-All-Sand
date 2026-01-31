@@ -1,8 +1,0 @@
-[
-{
-  "directory": "/home/crack/Documents/FuckassGame/build",
-  "command": "/usr/bin/c++   -std=gnu++17 -I/usr/include -o CMakeFiles/MyRaylibGame.dir/main.cpp.o -c /home/crack/Documents/FuckassGame/main.cpp",
-  "file": "/home/crack/Documents/FuckassGame/main.cpp",
-  "output": "CMakeFiles/MyRaylibGame.dir/main.cpp.o"
-}
-]

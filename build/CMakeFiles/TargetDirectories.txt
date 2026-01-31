@@ -1,0 +1,3 @@
+/home/crack/Documents/FuckassGame/build/CMakeFiles/MyRaylibGame.dir
+/home/crack/Documents/FuckassGame/build/CMakeFiles/edit_cache.dir
+/home/crack/Documents/FuckassGame/build/CMakeFiles/rebuild_cache.dir

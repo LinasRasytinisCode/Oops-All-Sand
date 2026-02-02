@@ -1,6 +1,5 @@
 #include "raylib.h"
 #include <cstdlib>
-#include <omp.h>
 
 const int SCREEN_WIDTH = 1280;
 const int SCREEN_HEIGHT = 720;
@@ -45,14 +44,7 @@ void SwitchPlaces(int x, int y, int new_x, int new_y,
   UpdateColor(new_x, new_y, pixelArray, pixels);
 }
 
-int main(void) {
-  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Falling sand");
-  SetTargetFPS(FPS_TARGET);
-
-  Element pixelArray[CANVAS_HEIGHT*CANVAS_WIDTH] = {AIR};
-
-  Color *pixels = (Color *)malloc(CANVAS_ARRAY_SIZE * sizeof(Color));
-
+void InitializeCanvas(Element pixelArray[CANVAS_ARRAY_SIZE], Color *pixels){
   for(int i = 0; i < CANVAS_ARRAY_SIZE; i++){
     int randomNumber = rand() % 3;
     switch (randomNumber) {
@@ -66,6 +58,17 @@ int main(void) {
         break;
     }
   }
+}
+
+int main(void) {
+  InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Falling sand");
+  SetTargetFPS(FPS_TARGET);
+
+  Element pixelArray[CANVAS_ARRAY_SIZE] = {AIR};
+
+  Color *pixels = (Color *)malloc(CANVAS_ARRAY_SIZE * sizeof(Color));
+
+  InitializeCanvas(pixelArray, pixels);
 
   Image display = GenImageColor(CANVAS_WIDTH, CANVAS_HEIGHT, BLANK);
 

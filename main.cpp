@@ -9,13 +9,19 @@ const int FPS_TARGET = 120;
 const int CANVAS_WIDTH = 320;
 const int CANVAS_HEIGHT = 180;
 
+const int CANVAS_ARRAY_SIZE = CANVAS_HEIGHT*CANVAS_WIDTH;
+
 enum Element { AIR = 0, SAND = 1, WATER = 2 };
 
-void UpdateColor(int x, int y, Element pixelArray[CANVAS_HEIGHT][CANVAS_WIDTH],
-                 Color *pixels) {
-  int index = y * CANVAS_WIDTH + x;
+inline int idx(int x, int y){
+  return y * CANVAS_WIDTH + x;
+}
 
-  switch (pixelArray[y][x]) {
+void UpdateColor(int x, int y, Element pixelArray[CANVAS_HEIGHT*CANVAS_WIDTH],
+                 Color *pixels) {
+  int index = idx(x, y);
+
+  switch (pixelArray[index]) {
   case SAND:
     pixels[index] = Color{215, 232, 199, 255};
     break;
@@ -29,11 +35,11 @@ void UpdateColor(int x, int y, Element pixelArray[CANVAS_HEIGHT][CANVAS_WIDTH],
 }
 
 void SwitchPlaces(int x, int y, int new_x, int new_y,
-                  Element pixelArray[CANVAS_HEIGHT][CANVAS_WIDTH],
+                  Element pixelArray[CANVAS_ARRAY_SIZE],
                   Color *pixels) {
-  auto temp = pixelArray[y][x];
-  pixelArray[y][x] = pixelArray[new_y][new_x];
-  pixelArray[new_y][new_x] = temp;
+  auto temp = pixelArray[idx(x, y)];
+  pixelArray[idx(x, y)] = pixelArray[idx(new_x, new_y)];
+  pixelArray[idx(new_x, new_y)] = temp;
 
   UpdateColor(x, y, pixelArray, pixels);
   UpdateColor(new_x, new_y, pixelArray, pixels);
@@ -43,28 +49,21 @@ int main(void) {
   InitWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Falling sand");
   SetTargetFPS(FPS_TARGET);
 
-  Element pixelArray[CANVAS_HEIGHT][CANVAS_WIDTH] = {AIR};
+  Element pixelArray[CANVAS_HEIGHT*CANVAS_WIDTH] = {AIR};
 
-  Color *pixels = (Color *)malloc(CANVAS_WIDTH * CANVAS_HEIGHT * sizeof(Color));
+  Color *pixels = (Color *)malloc(CANVAS_ARRAY_SIZE * sizeof(Color));
 
-  for (int y = 0; y < CANVAS_HEIGHT; y++) {
-    for (int x = 0; x < CANVAS_WIDTH; x++) {
-      int index = y * CANVAS_WIDTH + x;
-      int randomNumber = rand() % 3;
-      switch (randomNumber) {
+  for(int i = 0; i < CANVAS_ARRAY_SIZE; i++){
+    int randomNumber = rand() % 3;
+    switch (randomNumber) {
       case 0:
-        pixelArray[y][x] = AIR;
-        // pixels[index] = BLANK;
         break;
       case 1:
-        pixelArray[y][x] = SAND;
-        // pixels[index] = Color{215, 232, 199, 255};
+        pixelArray[i] = SAND;
         break;
       case 2:
-        pixelArray[y][x] = WATER;
-        // pixels[index] = BLUE;
+        pixelArray[i] = WATER;
         break;
-      }
     }
   }
 
@@ -77,41 +76,40 @@ int main(void) {
     for (int x = 0; x < CANVAS_WIDTH; x++) {
       for (int y = CANVAS_HEIGHT - 1; y >= 0; y--) {
 
-        Element current = pixelArray[y][x];
+        Element current = pixelArray[idx(x, y)];
         if (current == AIR)
           continue;
 
         if (y < CANVAS_HEIGHT - 1) {
           if (current == SAND) {
-            if (pixelArray[y + 1][x] == AIR)
+            if (pixelArray[idx(x, y+1)] == AIR)
               SwitchPlaces(x, y, x, y + 1, pixelArray, pixels);
-            else if (pixelArray[y + 1][x] == WATER)
+            else if (pixelArray[idx(x, y+1)] == WATER)
               SwitchPlaces(x, y, x, y + 1, pixelArray, pixels);
-            else if (x > 0 && pixelArray[y + 1][x - 1] == WATER)
+            else if (x > 0 && pixelArray[idx(x-1, y+1)] == WATER)
               SwitchPlaces(x, y, x - 1, y + 1, pixelArray, pixels);
-            else if (x < CANVAS_WIDTH - 1 && pixelArray[y + 1][x + 1] == WATER)
+            else if (x < CANVAS_WIDTH - 1 && pixelArray[idx(x+1, y+1)] == WATER)
               SwitchPlaces(x, y, x + 1, y + 1, pixelArray, pixels);
-            else if (x > 0 && pixelArray[y + 1][x - 1] == AIR)
+            else if (x > 0 && pixelArray[idx(x-1, y+1)] == AIR)
               SwitchPlaces(x, y, x - 1, y + 1, pixelArray, pixels);
-            else if (x < CANVAS_WIDTH - 1 && pixelArray[y + 1][x + 1] == AIR)
+            else if (x < CANVAS_WIDTH - 1 && pixelArray[idx(x+1, y+1)] == AIR)
               SwitchPlaces(x, y, x + 1, y + 1, pixelArray, pixels);
           } else if (current == WATER) {
-            if (pixelArray[y + 1][x] == AIR)
+            if (pixelArray[idx(x, y+1)] == AIR)
               SwitchPlaces(x, y, x, y + 1, pixelArray, pixels);
-            else if (x > 0 && pixelArray[y + 1][x - 1] == AIR)
+            else if (x > 0 && pixelArray[idx(x-1, y+1)] == AIR)
               SwitchPlaces(x, y, x - 1, y + 1, pixelArray, pixels);
-            else if (x < CANVAS_WIDTH - 1 && pixelArray[y + 1][x + 1] == AIR)
+            else if (x < CANVAS_WIDTH - 1 && pixelArray[idx(x+1, y+1)] == AIR)
               SwitchPlaces(x, y, x + 1, y + 1, pixelArray, pixels);
-            else if (x > 0 && pixelArray[y][x - 1] == AIR)
+            else if (x > 0 && pixelArray[idx(x-1, y)] == AIR)
               SwitchPlaces(x, y, x - 1, y, pixelArray, pixels);
-            else if (x < CANVAS_WIDTH - 1 && pixelArray[y][x + 1] == AIR)
+            else if (x < CANVAS_WIDTH - 1 && pixelArray[idx(x+1, y)] == AIR)
               SwitchPlaces(x, y, x + 1, y, pixelArray, pixels);
           }
         }
       }
     }
-    //This is terrible.
-    
+    // This is terrible.
 
     BeginDrawing();
     ClearBackground(BLACK);
